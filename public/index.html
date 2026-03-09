@@ -454,11 +454,20 @@
 
   /* ── RESPONSIVE ── */
   @media (max-width: 600px) {
-    .timeline::before { left: 20px; }
+    .timeline {
+      padding: 0 12px 40px;
+    }
+
+    .timeline::before { 
+      left: 30px; 
+      top: 20px;
+    }
 
     .tl-item {
-      grid-template-columns: 40px 1fr;
-      grid-template-rows: auto auto;
+      grid-template-columns: 60px 1fr;
+      grid-template-rows: auto auto auto;
+      gap: 0 16px;
+      margin-bottom: 48px;
     }
 
     .tl-item:nth-child(odd)  .tl-content,
@@ -469,11 +478,214 @@
 
     .tl-item:nth-child(odd)  .tl-doodle,
     .tl-item:nth-child(even) .tl-doodle {
-      grid-column: 2; grid-row: 2;
+      grid-column: 2; grid-row: 3;
       justify-content: flex-start;
+      margin-top: 8px;
     }
 
-    .tl-dot { grid-column: 1; grid-row: 1; margin: 6px auto 0; }
+    .tl-dot { 
+      grid-column: 1; 
+      grid-row: 1; 
+      margin: 6px auto 0;
+      width: 14px;
+      height: 14px;
+      border-width: 2px;
+    }
+
+    .tl-date {
+      font-size: .68rem;
+      margin-bottom: 4px;
+    }
+
+    .tl-title {
+      font-size: clamp(1rem, 2.2vw, 1.2rem);
+      margin-bottom: 5px;
+    }
+
+    .tl-desc {
+      font-size: .82rem;
+      line-height: 1.6;
+      margin-bottom: 6px;
+    }
+
+    .tl-photo {
+      max-width: 140px;
+      margin-top: 8px;
+    }
+
+    .tl-actions { 
+      gap: 4px; 
+      margin-top: 8px;
+    }
+
+    .tl-btn {
+      padding: 3px 9px;
+      font-size: .65rem;
+    }
+
+    .tl-doodle svg {
+      width: clamp(60px, 12vw, 80px);
+    }
+
+    /* Mobile family grid */
+    .family-grid {
+      gap: 16px;
+    }
+
+    .family-card {
+      width: 100%;
+      max-width: 160px;
+      padding: 24px 20px;
+    }
+
+    .family-card .emoji { font-size: 2rem; }
+
+    .family-card h3 {
+      font-size: 1rem;
+      margin-bottom: 3px;
+    }
+
+    .family-card p {
+      font-size: .75rem;
+    }
+
+    /* Mobile sections */
+    section {
+      padding: 48px 20px !important;
+    }
+
+    .section-heading {
+      margin-bottom: 32px;
+    }
+
+    .section-heading h2 {
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+    }
+
+    /* Mobile add button */
+    .add-memory-btn {
+      padding: 9px 22px;
+      font-size: .92rem;
+    }
+
+    /* Mobile modal */
+    .modal {
+      padding: 28px 24px 24px;
+      max-width: 90vw;
+      width: calc(100% - 40px);
+      max-height: 85vh;
+      margin: 0 20px;
+    }
+
+    .modal h3 {
+      font-size: 1.35rem;
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      font-size: .68rem;
+      margin-bottom: 5px;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="date"],
+    .form-group textarea {
+      padding: 9px 12px;
+      font-size: .9rem;
+    }
+
+    .form-group textarea {
+      min-height: 70px;
+    }
+
+    .modal-actions {
+      gap: 8px;
+    }
+
+    .btn-save, .btn-cancel {
+      padding: 8px 18px;
+      font-size: .82rem;
+      flex: 1;
+    }
+
+    /* Mobile confirm box */
+    .confirm-box {
+      padding: 24px 20px;
+      width: 90vw;
+      max-width: 280px;
+    }
+
+    .confirm-box p {
+      font-size: 1.1rem;
+      margin-bottom: 6px;
+    }
+
+    .confirm-btns {
+      gap: 8px;
+    }
+
+    .btn-confirm-del, .btn-cancel {
+      padding: 7px 16px;
+      font-size: .82rem;
+    }
+
+    /* Mobile hero */
+    .hero {
+      padding: 40px 24px 50px;
+    }
+
+    .hero-badge {
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+    }
+
+    .hero-names {
+      font-size: clamp(1.8rem, 4.5vw, 2.4rem);
+      margin: 12px 0;
+    }
+
+    .hero-years {
+      font-size: clamp(0.8rem, 1.8vw, 0.95rem);
+      margin: 12px 0;
+    }
+
+    /* Mobile photo section */
+    .photo-section {
+      padding: 16px 12px 50px;
+    }
+
+    .photo-frame {
+      width: min(300px, 90vw);
+      height: min(340px, 100vw);
+    }
+
+    .frame-edit-btn {
+      bottom: -14px;
+      padding: 5px 16px;
+      font-size: .72rem;
+    }
+
+    /* Mobile love note */
+    .love-note-section {
+      padding: 40px 16px 60px;
+    }
+
+    .love-note {
+      padding: 24px 20px;
+      font-size: clamp(1.05rem, 2.5vw, 1.35rem);
+    }
+
+    footer {
+      padding: 32px 20px 50px;
+    }
+
+    footer p {
+      font-size: 1rem;
+    }
+
+    footer small {
+      font-size: .7rem;
+    }
   }
 
   /* ── TIMELINE EDIT CONTROLS ── */
