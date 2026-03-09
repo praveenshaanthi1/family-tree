@@ -627,6 +627,8 @@
         <p>Add your favourite photo here 💕</p>
       </div>
     </div>
+    <button class="frame-edit-btn" id="frameEditBtn">✏ Edit Photo</button>
+    <button class="frame-remove-btn" id="frameRemoveBtn">✕</button>
   </div>
 </div>
 
@@ -679,7 +681,7 @@
 
 <!-- ── FOOTER ── -->
 <footer>
-  <p>Happy 4th Anniversary, my love 🌸</p>
+  <p>Our Family Story 🌸</p>
   <small>13 March 2022 — forever & always</small>
 </footer>
 
@@ -1419,6 +1421,19 @@ function saveMemories(targetMemory) {
   }
 }
 
+function seedDefaultMemoriesToDatabase(defaultMemories) {
+  console.log('Database is empty, seeding with default memories...');
+  var promises = [];
+  defaultMemories.forEach(function(m) {
+    promises.push(createMemoryOnServer(m));
+  });
+  return Promise.all(promises)
+    .then(function(results) {
+      console.log('Successfully seeded ' + results.length + ' default memories to database');
+      return results;
+    });
+}
+
 function loadMemories() {
   return fetch(API_URL + '/memories')
     .then(r => r.json())
@@ -1427,8 +1442,24 @@ function loadMemories() {
         memories.length = 0;
         saved.forEach(function(m) { memories.push(m); });
         console.log('Loaded ' + saved.length + ' memories from server');
+        return saved;
+      } else {
+        // Database is empty, seed with defaults
+        var defaultMemories = [];
+        memories.forEach(function(m) { defaultMemories.push(m); });
+        return seedDefaultMemoriesToDatabase(defaultMemories)
+          .then(function() {
+            // Reload from database after seeding
+            return fetch(API_URL + '/memories')
+              .then(r => r.json())
+              .then(function(reloaded) {
+                memories.length = 0;
+                reloaded.forEach(function(m) { memories.push(m); });
+                console.log('Reloaded ' + reloaded.length + ' memories from server after seeding');
+                return reloaded;
+              });
+          });
       }
-      return saved;
     })
     .catch(function(e) {
       console.error('Load failed:', e);
@@ -1461,16 +1492,63 @@ function loadFramePhoto() {
     });
 }
 
+function updateFramePhotoButtons() {
+  var framePhotoImg = document.getElementById('couple-photo');
+  var frameEditBtn = document.getElementById('frameEditBtn');
+  var frameRemoveBtn = document.getElementById('frameRemoveBtn');
+  var photoFrame = document.querySelector('.photo-frame');
+  
+  if (framePhotoImg && framePhotoImg.src && framePhotoImg.style.display !== 'none') {
+    // Photo is loaded, show buttons
+    frameEditBtn.style.display = 'inline-block';
+    frameRemoveBtn.style.display = 'flex';
+    frameRemoveBtn.classList.add('visible');
+    photoFrame.addEventListener('mouseenter', function() {
+      frameRemoveBtn.classList.add('visible');
+    });
+    photoFrame.addEventListener('mouseleave', function() {
+      // Keep it visible
+    });
+  } else {
+    // No photo, hide buttons
+    frameEditBtn.style.display = 'inline-block';
+    frameRemoveBtn.style.display = 'none';
+    frameRemoveBtn.classList.remove('visible');
+  }
+}
+
 // Initialize and load memories
 loadMemories().then(function() {
   sortMemories();
   buildTimeline();
   document.querySelectorAll('.family-card').forEach(function(el) { observer.observe(el); });
+  // Load frame photo and setup buttons
+  loadFramePhoto().then(function(photoData) {
+    if (photoData) {
+      var framePhotoImg = document.getElementById('couple-photo');
+      framePhotoImg.src = photoData;
+      framePhotoImg.style.display = 'block';
+      var placeholder = document.getElementById('photo-placeholder');
+      placeholder.style.display = 'none';
+    }
+    updateFramePhotoButtons();
+  });
 }).catch(function(e) {
   console.error('Initialization failed, using defaults:', e);
   sortMemories();
   buildTimeline();
   document.querySelectorAll('.family-card').forEach(function(el) { observer.observe(el); });
+  // Still try to load frame photo
+  loadFramePhoto().then(function(photoData) {
+    if (photoData) {
+      var framePhotoImg = document.getElementById('couple-photo');
+      framePhotoImg.src = photoData;
+      framePhotoImg.style.display = 'block';
+      var placeholder = document.getElementById('photo-placeholder');
+      placeholder.style.display = 'none';
+    }
+    updateFramePhotoButtons();
+  });
 });
 
 /* ── BUILD TIMELINE ── */
@@ -1573,6 +1651,7 @@ function buildTimeline() {
 /* ── MODAL LOGIC ── */
 var editIndex = null;
 var deleteIndex = null;
+var isEditingFramePhoto = false;
 var pendingPhoto = null;
 var photoRemoved = false;
 
@@ -1663,6 +1742,25 @@ function openDelete(i) {
   confirmBox.classList.add('open');
 }
 
+function openFramePhotoEdit() {
+  isEditingFramePhoto = true;
+  editIndex = null;
+  resetForm();
+  modalHeading.textContent = 'Edit Family Photo 📸';
+  // Load existing photo if available
+  var framePhotoImg = document.getElementById('couple-photo');
+  if (framePhotoImg && framePhotoImg.src) {
+    showPhotoPreview(framePhotoImg.src);
+  }
+  modal.classList.add('open');
+  setTimeout(function(){ fPhoto.focus(); }, 100);
+}
+
+function openFramePhotoDone() {
+  isEditingFramePhoto = false;
+  deleteIndex = null;
+}
+
 function closeModal()   { modal.classList.remove('open'); }
 function closeConfirm() { confirmBox.classList.remove('open'); }
 
@@ -1670,6 +1768,11 @@ document.getElementById('modalClose').addEventListener('click', closeModal);
 document.getElementById('modalCancel').addEventListener('click', closeModal);
 document.getElementById('confirmCancel').addEventListener('click', closeConfirm);
 document.getElementById('addMemoryBtn').addEventListener('click', openAdd);
+document.getElementById('frameEditBtn').addEventListener('click', openFramePhotoEdit);
+document.getElementById('frameRemoveBtn').addEventListener('click', function() {
+  deleteIndex = -1; // Special flag for frame photo delete
+  confirmBox.classList.add('open');
+});
 
 modal.addEventListener('click', function(e) { if (e.target === modal) closeModal(); });
 confirmBox.addEventListener('click', function(e) { if (e.target === confirmBox) closeConfirm(); });
@@ -1685,6 +1788,45 @@ fPhoto.addEventListener('change', function() {
 removePhotoBtn.addEventListener('click', function() { clearPhotoPreview(); });
 
 document.getElementById('modalSave').addEventListener('click', function() {
+  // Handle frame photo save
+  if (isEditingFramePhoto) {
+    if (pendingPhoto) {
+      saveFramePhoto(pendingPhoto).then(function() {
+        var framePhotoImg = document.getElementById('couple-photo');
+        framePhotoImg.src = pendingPhoto;
+        framePhotoImg.style.display = 'block';
+        var placeholder = document.getElementById('photo-placeholder');
+        placeholder.style.display = 'none';
+        console.log('Frame photo saved successfully');
+        openFramePhotoDone();
+        closeModal();
+        updateFramePhotoButtons();
+      }).catch(function(e) {
+        console.error('Failed to save frame photo:', e);
+        alert('Failed to save frame photo. Please try again.');
+      });
+    } else if (photoRemoved) {
+      var framePhotoImg = document.getElementById('couple-photo');
+      framePhotoImg.src = '';
+      framePhotoImg.style.display = 'none';
+      var placeholder = document.getElementById('photo-placeholder');
+      placeholder.style.display = 'flex';
+      saveFramePhoto(null).then(function() {
+        console.log('Frame photo removed successfully');
+        openFramePhotoDone();
+        closeModal();
+        updateFramePhotoButtons();
+      }).catch(function(e) {
+        console.error('Failed to remove frame photo:', e);
+        alert('Failed to remove frame photo. Please try again.');
+      });
+    } else {
+      alert('Please select a photo to upload');
+    }
+    return;
+  }
+
+  // Handle memory save
   var rawDate = fDate.value.trim();
   var date  = rawDate ? formatDateDisplay(rawDate) : '';
   var title = fTitle.value.trim();
@@ -1729,6 +1871,25 @@ document.getElementById('modalSave').addEventListener('click', function() {
 });
 
 document.getElementById('confirmDelete').addEventListener('click', function() {
+  // Handle frame photo deletion
+  if (deleteIndex === -1) {
+    var framePhotoImg = document.getElementById('couple-photo');
+    framePhotoImg.src = '';
+    framePhotoImg.style.display = 'none';
+    var placeholder = document.getElementById('photo-placeholder');
+    placeholder.style.display = 'flex';
+    saveFramePhoto(null).then(function() {
+      console.log('Frame photo deleted successfully');
+      deleteIndex = null;
+      closeConfirm();
+      updateFramePhotoButtons();
+    }).catch(function(e) {
+      console.error('Failed to delete frame photo:', e);
+      alert('Failed to delete frame photo. Please try again.');
+    });
+    return;
+  }
+
   if (deleteIndex === null) { closeConfirm(); return; }
   var memoryId = memories[deleteIndex].id;
   if (!memoryId) {
