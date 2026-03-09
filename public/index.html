@@ -455,76 +455,96 @@
   /* ── RESPONSIVE ── */
   @media (max-width: 600px) {
     .timeline {
-      padding: 0 12px 40px;
+      padding: 0 24px 40px;
+      position: relative;
     }
 
     .timeline::before { 
-      left: 30px; 
-      top: 20px;
+      left: 16px; 
+      top: 0;
+      bottom: 0;
     }
 
     .tl-item {
-      grid-template-columns: 60px 1fr;
-      grid-template-rows: auto auto auto;
-      gap: 0 16px;
-      margin-bottom: 48px;
+      display: block;
+      margin-bottom: 40px;
+      padding-left: 48px;
+      position: relative;
     }
 
-    .tl-item:nth-child(odd)  .tl-content,
-    .tl-item:nth-child(even) .tl-content {
-      grid-column: 2; grid-row: 1;
+    .tl-item:nth-child(odd),
+    .tl-item:nth-child(even) {
       text-align: left;
     }
 
-    .tl-item:nth-child(odd)  .tl-doodle,
-    .tl-item:nth-child(even) .tl-doodle {
-      grid-column: 2; grid-row: 3;
-      justify-content: flex-start;
-      margin-top: 8px;
+    .tl-content {
+      text-align: left;
     }
 
     .tl-dot { 
-      grid-column: 1; 
-      grid-row: 1; 
-      margin: 6px auto 0;
+      position: absolute;
+      left: 4px;
+      top: 6px;
+      margin: 0;
       width: 14px;
       height: 14px;
       border-width: 2px;
+      z-index: 2;
+    }
+
+    .tl-doodle {
+      margin-top: 12px;
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .tl-doodle svg {
+      width: clamp(50px, 10vw, 70px);
+      height: auto;
     }
 
     .tl-date {
-      font-size: .68rem;
+      font-size: .66rem;
       margin-bottom: 4px;
+      letter-spacing: .08em;
     }
 
     .tl-title {
-      font-size: clamp(1rem, 2.2vw, 1.2rem);
-      margin-bottom: 5px;
+      font-size: clamp(0.95rem, 2vw, 1.15rem);
+      margin-bottom: 4px;
+      font-weight: 600;
     }
 
     .tl-desc {
-      font-size: .82rem;
-      line-height: 1.6;
+      font-size: .8rem;
+      line-height: 1.55;
+      color: var(--light-text);
       margin-bottom: 6px;
     }
 
     .tl-photo {
-      max-width: 140px;
-      margin-top: 8px;
+      max-width: 100%;
+      margin-top: 10px;
+      margin-left: 0;
     }
 
     .tl-actions { 
-      gap: 4px; 
+      display: flex;
+      gap: 5px; 
       margin-top: 8px;
+      flex-wrap: wrap;
     }
 
     .tl-btn {
-      padding: 3px 9px;
-      font-size: .65rem;
+      padding: 4px 10px;
+      font-size: .64rem;
+      white-space: nowrap;
     }
 
-    .tl-doodle svg {
-      width: clamp(60px, 12vw, 80px);
+    .tl-auto-badge {
+      font-size: .58rem;
+      padding: 2px 8px;
+      margin-bottom: 4px;
     }
 
     /* Mobile family grid */
