@@ -1,0 +1,22 @@
+{
+  "name": "family-story",
+  "version": "1.0.0",
+  "description": "Our Family Story - A beautiful family memory timeline app",
+  "main": "api/index.js",
+  "scripts": {
+    "dev": "concurrently \"node api/index.js\" \"npx serve public -p 3000\"",
+    "start": "node api/index.js",
+    "install-deps": "npm install"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "mongodb": "^6.3.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.x"
+  }
+}
